@@ -23,7 +23,7 @@ let graphInnerWidth = graphXEnd-graphXStart;
 
 
 
-// Customizability START ------------------------------------------------------------------
+// Custom START ------------------------------------------------------------------
 
 function preload(){
     // Here put the csv file with the data and a header
@@ -46,7 +46,7 @@ function setup(){
     graphColumnsUnits = ['Gs', 'Gs', 'Gs'];
     // Here put the colors of the graph lines in rgb
     graphColors = [color(255, 130, 0), color(26, 165, 16), color(14, 105, 165)];
-    // Customizability END ---------------------------------------------------------------
+    // Custom END ---------------------------------------------------------------
 
 
     lineColor = color(180);
