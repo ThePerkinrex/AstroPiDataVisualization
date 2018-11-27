@@ -11,9 +11,9 @@ var sep;
 let width = 1580;
 let height = 815;
 let graphHeight = height-200;
-let graphXStart = 20;
+let graphXStart = 40;
 let graphYStart = 20;
-let graphXEnd = width-20;
+let graphXEnd = width-5;
 let graphYEnd = graphHeight-20;
 
 let graphInnerHeight = graphYEnd-graphYStart;
@@ -32,8 +32,8 @@ function preload(){
 
 
 // Here put the maximum & minimum of all the columns used
-let max_data = 0.05;
-let min_data = -0.01;
+let max_data = 0.042;
+let min_data = -0.026;
 
 // Here put the number of columns used
 let nOfElements = 3;
@@ -57,52 +57,69 @@ function setup(){
     //console.log(sep);
     textSize(15);
     console.log('Loaded');
-    noLoop();
 
-    for(let i = 0; i<graphColumns.length; i++){
-        console.log(graphColumns.length);
-    }
+    if(graphColumns.length != nOfElements && graphColumnsUnits.length != nOfElements && graphColors.length != nOfElements)
+        throw Error('Column data is not the length it should be')
+    text('Loaded data! Creating graph ...', 0,15);
 }
 
+let first_time = true;
+
 function draw(){
-    background(255);
-    noFill();
-    stroke(lineColor);
-    line(graphXStart, graphYEnd, graphXEnd, graphYEnd);
-    for(let i = graphXStart; i <= graphXEnd;i+=(graphInnerWidth/((60/5)*3))){
-        line(i, graphYStart, i, graphYEnd);
-    }
-    stroke(boldLineColor);
-    strokeWeight(3);
-    for(let x = graphXStart; x <= graphXEnd; x += graphInnerWidth/3){
-        line(x, graphYStart, x, graphYEnd);
-    }
-    strokeWeight(1);
-    noStroke();
-    for(let i = 0; i<graphColumns.length; i++){
-        fill(graphColors[i]);
-        rect(0, graphHeight+10+i*30, 30, 20);
-        if(graphColumnsUnits[i])
-            text(graphColumns[i] + '(' + graphColumnsUnits[i] + ')', 35, graphHeight+25+i*30);
-        else
-            text(graphColumns[i], 35, graphHeight+25+i*30);
-    }
-    
-    noFill();
-    let x = graphXStart;
-    let last_x = x;
-    let last_y = new Array(nOfElements);
-    for (let i = 0;i<table.rows.length;i++) {
-        let row = table.rows[i];
-        for(let j = 0;j<graphColumns.length;j++){
-            let y = map(row.get(graphColumns[j]), max_data, min_data, graphYEnd, graphYStart);
-            stroke(graphColors[j]);
-            if(last_y[j])
-                line(last_x, last_y[j], x, y);
-            last_y[j] = y;
+    if(first_time){
+        first_time=false;
+    }else{
+        let zeroMarkHeight = map(0, min_data, max_data, graphYEnd, graphYStart);
+        background(255);
+        noFill();
+        stroke(lineColor);
+        line(graphXStart, graphYEnd, graphXEnd, graphYEnd);
+        for(let i = graphXStart; i <= graphXEnd;i+=(graphInnerWidth/((60/5)*3))){
+            line(i, graphYStart, i, graphYEnd);
         }
-        last_x = x;
-        x+=sep;
+        stroke(boldLineColor);
+        strokeWeight(3);
+        for(let x = graphXStart; x <= graphXEnd; x += graphInnerWidth/3){
+            line(x, graphYStart, x, graphYEnd);
+        }
+        line(graphXStart, zeroMarkHeight, graphXEnd, zeroMarkHeight);
+        strokeWeight(1);
+        noStroke();
+        for(let i = 0; i<graphColumns.length; i++){
+            fill(graphColors[i]);
+            rect(0, graphHeight+10+i*30, 30, 20);
+            if(graphColumnsUnits[i])
+                text(graphColumns[i] + ' (' + graphColumnsUnits[i] + ')', 35, graphHeight+25+i*30);
+            else
+                text(graphColumns[i], 35, graphHeight+25+i*30);
+        }
+        fill(boldLineColor);
+        let dataTextSize = 12;
+        textSize(dataTextSize);
+        text(max_data, 0, graphYStart + dataTextSize/2);
+        text(min_data, 0, graphYEnd + dataTextSize/2);
+        text('0.0', 0, zeroMarkHeight + dataTextSize/2);
+        
+        noFill();
+        let x = graphXStart;
+        let last_x = x;
+        let last_y = new Array(nOfElements);
+        for (let i = 0;i<table.rows.length;i++) {
+            let row = table.rows[i];
+            for(let j = 0;j<graphColumns.length;j++){
+                if(row.get(graphColumns[j]) < min_data){
+                    console.log(graphColumns[j], row.get(graphColumns[j]))
+                }
+                let y = map(row.get(graphColumns[j]), min_data, max_data, graphYEnd, graphYStart);
+                stroke(graphColors[j]);
+                if(last_y[j])
+                    line(last_x, last_y[j], x, y);
+                last_y[j] = y;
+            }
+            last_x = x;
+            x+=sep;
+        }
+        console.log('Graph Loaded!');
+        noLoop();
     }
-    console.log('Graph Loaded!');
 }
