@@ -70,6 +70,10 @@ function draw(){
         first_time=false;
     }else{
         let zeroMarkHeight = map(0, min_data, max_data, graphYEnd, graphYStart);
+        //console.log(graphXStart, graphXEnd, graphYStart, graphYEnd);
+        //console.log(zeroMarkHeight, (zeroMarkHeight >= graphYStart && zeroMarkHeight <= graphYEnd), (zeroMarkHeight >= graphYStart && zeroMarkHeight <= graphYEnd)?zeroMarkHeight:undefined);
+        zeroMarkHeight = (zeroMarkHeight >= graphYStart && zeroMarkHeight <= graphYEnd)?zeroMarkHeight:undefined;
+        
         background(255);
         noFill();
         stroke(lineColor);
@@ -82,7 +86,8 @@ function draw(){
         for(let x = graphXStart; x <= graphXEnd; x += graphInnerWidth/3){
             line(x, graphYStart, x, graphYEnd);
         }
-        line(graphXStart, zeroMarkHeight, graphXEnd, zeroMarkHeight);
+        if(zeroMarkHeight)
+            line(graphXStart, zeroMarkHeight, graphXEnd, zeroMarkHeight);
         strokeWeight(1);
         noStroke();
         for(let i = 0; i<graphColumns.length; i++){
@@ -98,7 +103,8 @@ function draw(){
         textSize(dataTextSize);
         text(max_data, 0, graphYStart + dataTextSize/2);
         text(min_data, 0, graphYEnd + dataTextSize/2);
-        text('0.0', 0, zeroMarkHeight + dataTextSize/2);
+        if(zeroMarkHeight)
+            text('0.0', 0, zeroMarkHeight + dataTextSize/2);
         
         noFill();
         let x = graphXStart;
