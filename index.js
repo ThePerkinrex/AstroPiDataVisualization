@@ -19,7 +19,7 @@ let graphYEnd = graphHeight-20;
 let graphInnerHeight = graphYEnd-graphYStart;
 let graphInnerWidth = graphXEnd-graphXStart;
 
-
+let graph;
 
 // Custom START ------------------------------------------------------------------
 
@@ -68,6 +68,7 @@ function setup(){
         throw Error('Column data is not the length it should be')
     }else{
         createCanvas(width, height);
+        graph = createGraphics(width, height);
         sep = graphInnerWidth/table.rows.length;
         //console.log(sep);
         textSize(15);
@@ -76,56 +77,56 @@ function setup(){
     }
 }
 
-let first_time = true;
+let state = 0;
 
 function draw(){
-    if(first_time){
-        first_time=false;
-    }else{
+    if(state == 0){
+        state = 1;
+    }else if(state == 1){
         let zeroMarkHeight = map(0, min_data, max_data, graphYEnd, graphYStart);
         //console.log(graphXStart, graphXEnd, graphYStart, graphYEnd);
         //console.log(zeroMarkHeight, (zeroMarkHeight >= graphYStart && zeroMarkHeight <= graphYEnd), (zeroMarkHeight >= graphYStart && zeroMarkHeight <= graphYEnd)?zeroMarkHeight:undefined);
         zeroMarkHeight = (zeroMarkHeight >= graphYStart && zeroMarkHeight <= graphYEnd)?zeroMarkHeight:undefined;
         
-        background(255);
-        noFill();
-        stroke(lineColor);
+        graph.background(255);
+        graph.noFill();
+        graph.stroke(lineColor);
         for(let i = graphXStart; i <= graphXEnd;i+=(graphInnerWidth/((60/minSep)*hoursRun))){
-            line(i, graphYStart, i, graphYEnd);
+            graph.line(i, graphYStart, i, graphYEnd);
         }
-        stroke(boldLineColor);
-        strokeWeight(3);
-        strokeCap(PROJECT);
-        line(graphXStart, graphYEnd, graphXEnd, graphYEnd);
+        graph.stroke(boldLineColor);
+        graph.strokeWeight(3);
+        graph.strokeCap(PROJECT);
+        graph.line(graphXStart, graphYEnd, graphXEnd, graphYEnd);
         for(let x = graphXStart; x <= graphXEnd; x += graphInnerWidth/hoursRun){
-            line(x, graphYStart, x, graphYEnd);
+            graph.line(x, graphYStart, x, graphYEnd);
         }
         if(zeroMarkHeight)
-            line(graphXStart, zeroMarkHeight, graphXEnd, zeroMarkHeight);
-        strokeWeight(1);
-        noStroke();
+            graph.line(graphXStart, zeroMarkHeight, graphXEnd, zeroMarkHeight);
+        graph.strokeWeight(1);
+        graph.noStroke();
         for(let i = 0; i<graphColumns.length; i++){
-            fill(graphColors[i]);
-            rect(0, graphHeight+10+i*30, 30, 20);
+            graph.fill(graphColors[i]);
+            graph.rect(0, graphHeight+10+i*30, 30, 20);
             if(graphColumnsUnits[i])
-                text(graphColumns[i] + ' (' + graphColumnsUnits[i] + ')', 35, graphHeight+25+i*30);
+                graph.text(graphColumns[i] + ' (' + graphColumnsUnits[i] + ')', 35, graphHeight+25+i*30);
             else
-                text(graphColumns[i], 35, graphHeight+25+i*30);
+                graph.text(graphColumns[i], 35, graphHeight+25+i*30);
         }
-        fill(boldLineColor);
+        graph.fill(boldLineColor);
         let dataTextSize = 12;
-        textSize(dataTextSize);
-        text(max_data, graphXStart-textWidth(max_data + ' '), graphYStart + dataTextSize/2);
-        text(min_data, graphXStart-textWidth(min_data + ' '), graphYEnd + dataTextSize/2);
+        graph.textSize(dataTextSize);
+        graph.text(max_data, graphXStart-graph.textWidth(max_data + ' '), graphYStart + dataTextSize/2);
+        graph.text(min_data, graphXStart-graph.textWidth(min_data + ' '), graphYEnd + dataTextSize/2);
         if(zeroMarkHeight)
-            text('0.0', graphXStart-textWidth('0.0 '), zeroMarkHeight + dataTextSize/2);
+            graph.text('0.0', graphXStart-graph.textWidth('0.0 '), zeroMarkHeight + dataTextSize/2);
         
         for(let i = 0; i <= hoursRun; i++){
             if(i>0)
-            text(i+'h', graphXStart+graphInnerWidth*i/hoursRun-(textWidth(i+'h')/2), graphYEnd+dataTextSize);
+            graph.text(i+'h', graphXStart+graphInnerWidth*i/hoursRun-(graph.textWidth(i+'h')/2), graphYEnd+dataTextSize);
         }
         
-        noFill();
+        graph.noFill();
         let x = graphXStart;
         let last_x = x;
         let last_y = new Array(nOfElements);
@@ -136,15 +137,36 @@ function draw(){
                     console.log(graphColumns[j], row.get(graphColumns[j]))
                 }
                 let y = map(row.get(graphColumns[j]), min_data, max_data, graphYEnd, graphYStart);
-                stroke(graphColors[j]);
+                graph.stroke(graphColors[j]);
                 if(last_y[j])
-                    line(last_x, last_y[j], x, y);
+                    graph.line(last_x, last_y[j], x, y);
                 last_y[j] = y;
             }
             last_x = x;
             x+=sep;
         }
         console.log('Graph Loaded!');
-        noLoop();
+        image(graph, 0, 0);
+        state = 2;
+    }else if(state == 2){
+        // Interactivity
+        image(graph, 0, 0);
+        if(mouseX>=graphXStart && mouseX<=graphXEnd && mouseY>=graphYStart && mouseY<=graphYEnd){
+            cursor(CROSS);
+            stroke(0);
+            fill(255);
+            let dataTextSize = 12;
+            textSize(dataTextSize);
+            let time = round(map(mouseX, graphXStart, graphXEnd, 0, hoursRun)*60);
+            let yVal = custom_round(map(mouseY, graphYEnd, graphYStart, min_data, max_data),4);
+            console.log(mouseY, graphYEnd, graphYStart );
+            let txt = convert_time_to_string(time) + ' | ' + yVal;
+            rect(mouseX + 5, mouseY + 5, textWidth(txt)+2, dataTextSize+1);
+            noStroke();
+            fill(0);
+            text(txt, mouseX + 6, mouseY + dataTextSize + 4.5);
+        }else{
+            cursor(ARROW);
+        }
     }
 }
