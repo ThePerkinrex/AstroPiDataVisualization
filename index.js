@@ -20,6 +20,9 @@ let graphInnerHeight = graphYEnd-graphYStart;
 let graphInnerWidth = graphXEnd-graphXStart;
 
 let graph;
+let overlay;
+
+let lastMouse = false;
 
 // Custom START ------------------------------------------------------------------
 
@@ -69,6 +72,7 @@ function setup(){
     }else{
         createCanvas(width, height);
         graph = createGraphics(width, height);
+        overlay = createGraphics(width, height);
         sep = graphInnerWidth/table.rows.length;
         //console.log(sep);
         textSize(15);
@@ -151,6 +155,7 @@ function draw(){
     }else if(state == 2){
         // Interactivity
         image(graph, 0, 0);
+        image(overlay, 0, 0);
         if(mouseX>=graphXStart && mouseX<=graphXEnd && mouseY>=graphYStart && mouseY<=graphYEnd){
             cursor(CROSS);
             stroke(0);
@@ -159,14 +164,35 @@ function draw(){
             textSize(dataTextSize);
             let time = round(map(mouseX, graphXStart, graphXEnd, 0, hoursRun)*60);
             let yVal = custom_round(map(mouseY, graphYEnd, graphYStart, min_data, max_data),4);
-            console.log(mouseY, graphYEnd, graphYStart );
             let txt = convert_time_to_string(time) + ' | ' + yVal;
             rect(mouseX + 5, mouseY + 5, textWidth(txt)+2, dataTextSize+1);
             noStroke();
             fill(0);
             text(txt, mouseX + 6, mouseY + dataTextSize + 4.5);
+            if(!lastMouse && mouseIsPressed){
+                // CLICK
+                overlay.stroke(0);
+                overlay.noFill();
+                overlay.line(mouseX - 5, mouseY, mouseX + 5, mouseY);
+                overlay.line(mouseX, mouseY - 5, mouseX, mouseY + 5);
+                overlay.fill(255);
+                overlay.textSize(dataTextSize);
+                overlay.rect(mouseX + 5, mouseY + 5, textWidth(txt)+2, dataTextSize+1);
+                overlay.noStroke();
+                overlay.fill(0);
+                overlay.text(txt, mouseX + 6, mouseY + dataTextSize + 4.5);
+            }
+            lastMouse = mouseIsPressed;
         }else{
             cursor(ARROW);
         }
     }
+}
+
+function keyPressed(){
+
+    if (keyCode == BACKSPACE || keyCode == DELETE){
+        overlay.clear();
+    }
+    // IF YOU'VE READ THIS AND WANT TO ADD MORE FEATURES, JUST DO IT (AND IT WOULD BE NICE IF YOU SEND A PULL REQUEST, SO I CAN ADD IT MYSELF)
 }

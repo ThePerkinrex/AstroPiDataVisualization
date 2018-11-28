@@ -6,6 +6,9 @@ Here's an example:
 
 ![Graph example image](graph_example.png)
 
+To mark a point, just click it.
+To delete all marks, hit backspace or delete
+
 It is a web page.
 
 It uses [p5.js](https://p5js.org) to create the graph & load the data.
