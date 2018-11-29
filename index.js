@@ -21,6 +21,7 @@ let graphInnerWidth = graphXEnd-graphXStart;
 
 let graph;
 let overlay;
+let markers = [];
 
 let lastMouse = false;
 
@@ -156,6 +157,11 @@ function draw(){
         // Interactivity
         image(graph, 0, 0);
         image(overlay, 0, 0);
+        for(let i = 0; i<markers.length;i++){
+            markers[i].draw();
+        }
+
+
         if(mouseX>=graphXStart && mouseX<=graphXEnd && mouseY>=graphYStart && mouseY<=graphYEnd){
             cursor(CROSS);
             stroke(0);
@@ -171,21 +177,22 @@ function draw(){
             text(txt, mouseX + 6, mouseY + dataTextSize + 4.5);
             if(!lastMouse && mouseIsPressed){
                 // CLICK
-                overlay.stroke(0);
-                overlay.noFill();
-                overlay.line(mouseX - 5, mouseY, mouseX + 5, mouseY);
-                overlay.line(mouseX, mouseY - 5, mouseX, mouseY + 5);
-                overlay.fill(255);
-                overlay.textSize(dataTextSize);
-                overlay.rect(mouseX + 5, mouseY + 5, textWidth(txt)+2, dataTextSize+1);
-                overlay.noStroke();
-                overlay.fill(0);
-                overlay.text(txt, mouseX + 6, mouseY + dataTextSize + 4.5);
+                if(mouseButton == LEFT){
+                    markers.push(new Marker(txt, dataTextSize));
+                }else if(mouseButton == RIGHT){
+                    for(let i = 0; i<markers.length;i++){
+                        if(markers[i].isMouseInside()){
+                            markers.splice(i);
+                            break;
+                        }
+                    }
+                }
             }
             lastMouse = mouseIsPressed;
         }else{
             cursor(ARROW);
         }
+        
     }
 }
 
@@ -193,6 +200,7 @@ function keyPressed(){
 
     if (keyCode == BACKSPACE || keyCode == DELETE){
         overlay.clear();
+        markers = [];
     }
     // IF YOU'VE READ THIS AND WANT TO ADD MORE FEATURES, JUST DO IT (AND IT WOULD BE NICE IF YOU SEND A PULL REQUEST, SO I CAN ADD IT MYSELF)
 }
