@@ -180,7 +180,7 @@ function draw(){
                 if(mouseButton == LEFT){
                     markers.push(new Marker(txt, dataTextSize));
                 }else if(mouseButton == RIGHT){
-                    for(let i = 0; i<markers.length;i++){
+                    for(let i = markers.length-1; i>=0;i--){
                         if(markers[i].isMouseInside()){
                             markers.splice(i,1);
                             break;
