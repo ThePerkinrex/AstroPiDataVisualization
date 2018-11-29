@@ -6,8 +6,9 @@ Here's an example:
 
 ![Graph example image](graph_example.png)
 
-To mark a point, just click it.
-To delete all marks, hit backspace or delete
+To mark a point, just left-click it.
+To delete a single marker, just right-click it.
+To delete all marker, hit backspace or delete.
 
 It is a web page.
 

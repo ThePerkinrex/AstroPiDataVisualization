@@ -182,7 +182,7 @@ function draw(){
                 }else if(mouseButton == RIGHT){
                     for(let i = 0; i<markers.length;i++){
                         if(markers[i].isMouseInside()){
-                            markers.splice(i);
+                            markers.splice(i,1);
                             break;
                         }
                     }
